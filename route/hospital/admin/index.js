@@ -153,6 +153,45 @@ const hospital = {
       console.error('Error fetching data by hosname:', err)
       res.status(500).json({ code: 500, message: 'Internal server error' })
     }
+  },
+  findDetail: async (req, res) => {
+    try {
+      const { hoscode } = req.params // 从请求参数中获取 hoscode
+      console.log(req.params)
+
+      // 验证 hoscode 是否存在
+      if (!hoscode) {
+        return res.status(400).json({ code: 400, message: 'hoscode is required' })
+      }
+
+      // 构建查询语句
+      const query = `
+        SELECT h.*, hd.route
+        FROM hospital h
+        JOIN hospital_detail hd ON h.hoscode = hd.hoscode
+        WHERE h.hoscode = ?;
+      `
+      const queryParams = [hoscode]
+
+      // 执行查询
+      db.query(query, queryParams, (error, result) => {
+        if (error) {
+          console.error('Database query error:', error)
+          return res.status(500).json({ code: 500, message: 'Internal server error' })
+        }
+
+        // 返回查询结果
+        res.json({
+          code: 200,
+          message: 'Ok',
+          data: result
+        })
+      })
+    } catch (err) {
+      console.error('Error fetching data by hoscode:', err)
+      res.status(500).json({ code: 500, message: 'Internal server error' })
+    }
   }
 }
+
 module.exports = hospital
