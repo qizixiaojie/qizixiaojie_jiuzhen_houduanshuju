@@ -31,9 +31,6 @@ const hospital = {
       query += ' LIMIT ? OFFSET ?'
       queryParams.push(pageSize, offset)
 
-      console.log('Executing query:', query) // 打印 SQL 查询语句以便调试
-      console.log('With parameters:', queryParams) // 打印 SQL 查询参数以便调试
-
       db.query(query, queryParams, (error, result, fields) => {
         if (error) {
           console.error('Database query error:', error) // 打印数据库查询错误以便调试
@@ -58,7 +55,6 @@ const hospital = {
     try {
       // 获取 grade 参数
       const grade = req.params.grade
-      console.log(grade)
 
       // 构建查询语句，根据 grade 进行筛选
       const query = `SELECT * FROM HOSPITAL WHERE hostype =? `
@@ -122,7 +118,6 @@ const hospital = {
   },
   nameKey: async (req, res) => {
     try {
-      console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
       const { hosname } = req.params // 从 req.params 中获取 hosname
       console.log(req.params)
 
@@ -157,7 +152,6 @@ const hospital = {
   findDetail: async (req, res) => {
     try {
       const { hoscode } = req.params // 从请求参数中获取 hoscode
-      console.log(req.params)
 
       // 验证 hoscode 是否存在
       if (!hoscode) {
@@ -165,12 +159,18 @@ const hospital = {
       }
 
       // 构建查询语句
+      // const query = `
+      //   SELECT h.*, hd.route
+      //   FROM hospital h
+      //   JOIN hospital_detail hd ON h.hoscode = hd.hoscode
+      //   WHERE h.hoscode = ?;
+      // `
       const query = `
-        SELECT h.*, hd.route
-        FROM hospital h
-        JOIN hospital_detail hd ON h.hoscode = hd.hoscode
-        WHERE h.hoscode = ?;
-      `
+      SELECT DISTINCT h.*, hd.*
+      FROM hospital h
+      JOIN hospital_detail hd ON h.hoscode = hd.hoscode
+      WHERE h.hoscode=?;
+    `
       const queryParams = [hoscode]
 
       // 执行查询
@@ -179,7 +179,6 @@ const hospital = {
           console.error('Database query error:', error)
           return res.status(500).json({ code: 500, message: 'Internal server error' })
         }
-
         // 返回查询结果
         res.json({
           code: 200,
