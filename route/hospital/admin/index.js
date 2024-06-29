@@ -2,9 +2,6 @@ const db = require('../../db/index')
 const hospital = {
   //获取分页列表数据
   hospitalCard: async (req, res) => {
-    console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-    console.log(req.params) // 打印请求参数以便调试
-
     try {
       const pageSize = parseInt(req.params.pageSize || 10)
       const page = parseInt(req.params.page, 10)
@@ -120,6 +117,40 @@ const hospital = {
       })
     } catch (err) {
       console.error('Error fetching hospital data:', err)
+      res.status(500).json({ code: 500, message: 'Internal server error' })
+    }
+  },
+  nameKey: async (req, res) => {
+    try {
+      console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+      const { hosname } = req.params // 从 req.params 中获取 hosname
+      console.log(req.params)
+
+      // 验证 hosname 是否存在
+      if (!hosname) {
+        return res.status(400).json({ code: 400, message: 'hosname is required' })
+      }
+
+      // 构建查询语句
+      const query = 'SELECT * FROM HOSPITAL WHERE hosname LIKE ?'
+      const queryParams = [`%${hosname}%`] // 使用百分号包裹关键字以实现模糊匹配
+
+      // 执行查询
+      db.query(query, queryParams, (error, result) => {
+        if (error) {
+          console.error('Database query error:', error)
+          return res.status(500).json({ code: 500, message: 'Internal server error' })
+        }
+
+        // 返回查询结果
+        res.json({
+          code: 200,
+          message: 'Ok',
+          data: result
+        })
+      })
+    } catch (err) {
+      console.error('Error fetching data by hosname:', err)
       res.status(500).json({ code: 500, message: 'Internal server error' })
     }
   }

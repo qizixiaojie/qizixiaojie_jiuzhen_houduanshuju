@@ -13,4 +13,6 @@ router.get('/hospital_grade/classify', hospital.gradeClassify)
 router.get('/hospital_region/classify', hospital.regionClassify)
 //获取医院等级数据
 router.get('/hospital_grade/:grade', hospital.gardeCard)
+//根据医院名字放回数据
+router.get('/hospital_name/:hosname',hospital.nameKey)
 module.exports = router
