@@ -150,6 +150,7 @@ const hospital = {
     }
   },
   findDetail: async (req, res) => {
+    console.log(123333)
     try {
       const { hoscode } = req.params // 从请求参数中获取 hoscode
 
@@ -190,6 +191,48 @@ const hospital = {
       console.error('Error fetching data by hoscode:', err)
       res.status(500).json({ code: 500, message: 'Internal server error' })
     }
+  },
+  findDepartments: (req, res) => {
+    // 查询父部门
+    db.query('SELECT * FROM hospital_department', (err, parentDepartmentsRows) => {
+      if (err) {
+        console.error('Error fetching parent departments:', err)
+        return res.status(500).json({
+          code: 500,
+          message: '内部服务器错误',
+          error: err.message // 或者其他错误详情，取决于您的需求
+        })
+      }
+      const parentDepartmentsMap = new Map(parentDepartmentsRows.map(row => [row.depcode, { ...row, children: [] }]))
+
+      // 查询子部门
+      db.query('SELECT * FROM hospital_sub_department', (err, subDepartmentsRows) => {
+        if (err) {
+          console.error('Error fetching sub departments:', err)
+          return res.status(500).json({
+            code: 500,
+            message: '内部服务器错误',
+            error: err.message // 或者其他错误详情，取决于您的需求
+          })
+        }
+
+        console.log('Sub departments:', subDepartmentsRows) // 打印子部门查询结果
+
+        for (const subDep of subDepartmentsRows) {
+          const parentDep = parentDepartmentsMap.get(subDep.depcode)
+          if (parentDep) {
+            parentDep.children.push({ sub_depcode: subDep.sub_depcode, sub_depname: subDep.sub_depname })
+          }
+        }
+
+        const departments = Array.from(parentDepartmentsMap.values())
+        res.json({
+          code: 200,
+          message: '成功',
+          data: departments
+        })
+      })
+    })
   }
 }
 

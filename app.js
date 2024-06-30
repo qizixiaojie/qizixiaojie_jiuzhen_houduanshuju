@@ -11,6 +11,7 @@ app.use(cors())
 // 监听GET请求到'/'路径
 app.use('/', hospital)
 app.use('/hospital', hospital)
+app.use('/user',user)    
 
 // 开始监听指定端口
 
