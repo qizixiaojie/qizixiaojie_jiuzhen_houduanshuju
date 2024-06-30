@@ -1,9 +1,14 @@
 //引入express
 const express = require('express')
 //引入hospital的处理函数
-const hospital = require('./admin/index.js')
+const user = require('./admin/index.js')
 //创建router对象
 const router = express.Router()
 
 //用户注册
-router.get('', hospital.hospitalCard)
+router.post('/register', user.userRegister)
+//用户登录
+router.post('/login', user.userLogin)
+//用户忘记密码
+router.post('/logout', user.userLogout)
+module.exports = router

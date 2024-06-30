@@ -150,7 +150,6 @@ const hospital = {
     }
   },
   findDetail: async (req, res) => {
-    console.log(123333)
     try {
       const { hoscode } = req.params // 从请求参数中获取 hoscode
 
@@ -216,7 +215,7 @@ const hospital = {
           })
         }
 
-        console.log('Sub departments:', subDepartmentsRows) // 打印子部门查询结果
+        // console.log('Sub departments:', subDepartmentsRows) // 打印子部门查询结果
 
         for (const subDep of subDepartmentsRows) {
           const parentDep = parentDepartmentsMap.get(subDep.depcode)
