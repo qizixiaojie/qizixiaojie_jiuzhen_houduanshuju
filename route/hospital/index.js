@@ -19,4 +19,6 @@ router.get('/hospital_name/:hosname', hospital.nameKey)
 router.get('/hospital_detail/:hoscode', hospital.findDetail)
 // //获取医院部门数据
 router.get('/hospital_depart/departments', hospital.findDepartments)
+//获取医院医生具体数据
+router.get('/hospital_doctor/Detail',hospital.doctorDetial)
 module.exports = router

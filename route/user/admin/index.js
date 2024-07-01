@@ -104,7 +104,8 @@ const user = {
   },
   //忘记密码
   userLogout: async (req, res) => {
-    const { userName, newPassword } = req.query
+    console.log(req.body)
+    const { userName, newPassword } = req.body
 
     if (!userName || !newPassword) {
       return res.status(400).json({
@@ -131,6 +132,7 @@ const user = {
       await db.query(updatePasswordQuery, [hashedPassword, userName])
 
       res.json({
+        code: 200,
         success: true,
         message: '密码更新成功'
       })

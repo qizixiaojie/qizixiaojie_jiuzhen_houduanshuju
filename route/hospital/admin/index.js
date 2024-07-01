@@ -232,6 +232,73 @@ const hospital = {
         })
       })
     })
+  },
+  doctorDetial: async (req, res) => {
+    console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    const { hoscode, sub_depcode } = req.query
+
+    // 先查询医院信息
+    const queryHos = `SELECT hosname FROM hospital WHERE hoscode = '${hoscode}'`
+    let hosname = '' //医院信息
+    db.query(queryHos, (error, results) => {
+      if (error) {
+        console.error('查询错误:', error)
+        res.status(500).send('内部服务器错误')
+        return
+      }
+      if (results.length > 0) {
+        hosname = results[0].hosname
+      }
+    })
+    //再次对医生查询
+    let depcode = ''
+    let sub_depname = '' //具体那个科室
+    let doctor = ''
+    let doctor_time = ''
+    //对医生信息进行反向查询
+
+    const queryDoc = `SELECT depcode,sub_depname FROM hospital_sub_department WHERE sub_depcode = '${sub_depcode}'`
+    db.query(queryDoc, (error, results) => {
+      if (error) {
+        console.error('查询错误:', error)
+        res.status(500).send('内部服务器错误')
+        return
+      }
+      if (results.length > 0) {
+        depcode = results[0].depcode
+        sub_depname = results[0].sub_depname
+        //1.查询对应的医生
+        if (depcode !== '') {
+          const queryone = ` SELECT * FROM hospital_doctor WHERE hospital_doctor.depcode = '${depcode}';`
+          db.query(queryone, (error, results) => {
+            if (error) {
+              console.error('Error executing query:', error)
+              return
+            }
+            doctor = results[0]
+            // 2根据医生获取排班信息
+            const querytwo = ` SELECT * FROM hospital_doctor_time  WHERE hospital_doctor_time.doctorID = '${doctor.id}';`
+            db.query(querytwo, (error, results) => {
+              if (error) {
+                console.error('Error executing query:', error)
+                return
+              }
+              doctor_time = results
+              res.json({
+                code: 200,
+                message: '医生相关数据调用成功',
+                data: {
+                  doctor: doctor,
+                  sub_depname: sub_depname,
+                  doctor_time: doctor_time,
+                  hosname: hosname
+                }
+              })
+            })
+          })
+        }
+      }
+    })
   }
 }
 
