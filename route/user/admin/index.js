@@ -143,6 +143,27 @@ const user = {
         message: '内部服务器错误'
       })
     }
+  },
+  // 将获取过来的数据推送到数据库存储
+  userOrder: (req, res) => {
+    console.log(req.body)
+    const { username, IDcard, Realname, phone, money, isPay, doctor, date, hosname, sub_depname } = req.body.data
+
+    const sql = `INSERT INTO user_order (username, IDcard, Realname, phone, money, isPay, doctor, date, hosname, sub_depname) 
+                 VALUES (?,?,?,?,?,?,?,?,?,?)`
+
+    db.query(sql, [username, IDcard, Realname, phone, money, isPay, doctor, date, hosname, sub_depname], (err, result) => {
+      if (err) {
+        console.error('Error inserting data:', err)
+        res.status(500).send('Internal Server Error')
+        return
+      }
+      res.json({
+        code: 200,
+        success: true,
+        message: '订单添加成功'
+      })
+    })
   }
 }
 module.exports = user

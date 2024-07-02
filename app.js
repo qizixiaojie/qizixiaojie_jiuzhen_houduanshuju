@@ -12,14 +12,26 @@ const PORT = 8080
 //配置跨域请求
 app.use(cors())
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded())
+app.use(bodyParser.urlencoded({ extended: false }))
 
 // 导入医院相关的数据
 // 监听GET请求到'/'路径
 app.use('/', hospital)
 app.use('/hospital', hospital)
 app.use('/user', user)
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '')
+  next()
+})
+app.get('/jokes/random', (req, res) => {
+  request({ url: 'https://joke-api-strict-cors.appspot.com/jokes/random' }, (error, response, body) => {
+    if (error || response.statusCode !== 200) {
+      return res.status(500).json({ type: 'error', message: err.message })
+    }
 
+    res.json(JSON.parse(body))
+  })
+})
 // 用户登录相关
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())

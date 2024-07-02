@@ -11,4 +11,6 @@ router.post('/register', user.userRegister)
 router.post('/login', user.userLogin)
 //用户忘记密码
 router.post('/logout', user.userLogout)
+//用户推送订单
+router.post('/order', user.userOrder)
 module.exports = router

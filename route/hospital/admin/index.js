@@ -234,7 +234,6 @@ const hospital = {
     })
   },
   doctorDetial: async (req, res) => {
-    console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     const { hoscode, sub_depcode } = req.query
 
     // 先查询医院信息
