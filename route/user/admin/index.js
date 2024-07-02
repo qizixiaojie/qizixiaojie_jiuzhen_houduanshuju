@@ -147,22 +147,92 @@ const user = {
   // 将获取过来的数据推送到数据库存储
   userOrder: (req, res) => {
     console.log(req.body)
-    const { username, IDcard, Realname, phone, money, isPay, doctor, date, hosname, sub_depname } = req.body.data
+    const { username, IDcard, Realname, phone, money, isPay, doctor, date, hosname, sub_depname, M_or_A } = req.body.data
 
-    const sql = `INSERT INTO user_order (username, IDcard, Realname, phone, money, isPay, doctor, date, hosname, sub_depname) 
-                 VALUES (?,?,?,?,?,?,?,?,?,?)`
+    const sql = `INSERT INTO user_order (username, IDcard, Realname, phone, money, isPay, doctor, date, hosname, sub_depname,M_or_A) VALUES (?,?,?,?,?,?,?,?,?,?,?)`
 
-    db.query(sql, [username, IDcard, Realname, phone, money, isPay, doctor, date, hosname, sub_depname], (err, result) => {
+    db.query(sql, [username, IDcard, Realname, phone, money, isPay, doctor, date, hosname, sub_depname, M_or_A], (err, result) => {
       if (err) {
         console.error('Error inserting data:', err)
         res.status(500).send('Internal Server Error')
         return
+      }
+      if (M_or_A === '上午') {
+        const sql1 = `SELECT doctorID FROM hospital_doctor WHERE name =?`
+        db.query(sql1, [doctor], (err, result) => {
+          if (err) {
+            console.log('获取 id 错误')
+            return
+          } else {
+            const doctorID = result[0].doctorID
+            // 减去它这那一周上午的值
+            const sql2 = `UPDATE hospital_doctor_time SET morningCount = morningCount - 1 WHERE doctorID =? AND toDay =?`
+            db.query(sql2, [doctorID, date], (err, result) => {
+              if (err) {
+                console.log('减少上午失败')
+              } else {
+                console.log('减少上午成功')
+              }
+            })
+          }
+        })
+      } else if (M_or_A === '下午') {
+        const sql3 = `SELECT doctorID FROM hospital_doctor WHERE name =?`
+        db.query(sql3, [doctor], (err, result) => {
+          if (err) {
+            console.log('获取下午 id 错误')
+            return
+          } else {
+            const doctorID = result[0].doctorID
+            // 减去它这那一周下午的值
+            const sql4 = `UPDATE hospital_doctor_time SET afternoonCount = afternoonCount - 1 WHERE doctorID =? AND toDay =?`
+            db.query(sql4, [doctorID, date], (err, result) => {
+              if (err) {
+                console.log('减少下午失败')
+              } else {
+                console.log('减少下午成功')
+              }
+            })
+          }
+        })
       }
       res.json({
         code: 200,
         success: true,
         message: '订单添加成功'
       })
+    })
+  },
+  userGetOrder: (req, res) => {
+    const { username } = req.body
+
+    const sql = `SELECT * FROM user_order WHERE username =?`
+
+    db.query(sql, [username], (err, results) => {
+      if (err) {
+        console.error('Error querying data:', err)
+        res.status(500).send('Internal Server Error')
+        return
+      }
+      res.send(results)
+    })
+  },
+  userCancelOrder: (req, res) => {
+    const { user_orderID } = req.body
+    console.log(req.body)
+    const sql = `DELETE FROM user_order WHERE user_orderID =?`
+
+    db.query(sql, [user_orderID], (err, result) => {
+      if (err) {
+        console.error('删除订单出错:', err)
+        res.status(500).send('服务器内部错误')
+        return
+      }
+      if (result.affectedRows === 0) {
+        res.status(404).send('未找到订单')
+        return
+      }
+      res.send('订单取消成功')
     })
   }
 }

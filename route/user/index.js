@@ -13,4 +13,8 @@ router.post('/login', user.userLogin)
 router.post('/logout', user.userLogout)
 //用户推送订单
 router.post('/order', user.userOrder)
+//获取订单数据
+router.post('/getorder',user.userGetOrder)
+//删除订单数据
+router.post('/cancel_order',user.userCancelOrder)
 module.exports = router
