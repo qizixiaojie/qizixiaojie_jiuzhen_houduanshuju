@@ -13,15 +13,15 @@ const admin_hospital = {
     } = req.body;
     // 执行查询获取最后一个 id 值
     let hoscode = ''
-    db.query('SELECT MAX(id) AS last_id FROM hospital', (err, results) => {
-      if (err) {
-        console.error('查询错误:', err);
-        return;
-      }
-      hoscode = results[0].last_id + 1;
-      console.log(hoscode);
-    });
-    console.log(typeof (hostype));
+    if (hosname) {
+      db.query('SELECT MAX(id) AS last_id FROM hospital', (err, results) => {
+        if (err) {
+          console.error('查询错误:', err);
+          return;
+        }
+        hoscode = results[0].last_id + 1;
+      });
+    }
     // 构建查询语句，检查是否存在相同的 hosname
     const checkQuery = `SELECT * FROM hospital WHERE hosname = '${hosname}'`;
 

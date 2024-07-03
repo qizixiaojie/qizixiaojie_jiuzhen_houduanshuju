@@ -2,7 +2,8 @@ const express = require('express')
 const app = express()
 const hospital = require('./route/hospital/index')
 const user = require('./route/user/index')
-const admin_hospital=require('./route/admin_hospital')
+const admin_hospital = require('./route/admin_hospital')
+const admin_doctor = require('./route/admin_doctor')
 const cors = require('cors')
 
 //这个组件用于接收post数据
@@ -15,8 +16,8 @@ app.use(cors())
 app.use(bodyParser.json())
 // 增加请求大小限制
 
-app.use(bodyParser.json({limit:'10000000mb'}));
-app.use(bodyParser.urlencoded({limit:'10000000mb',extended:true}));
+app.use(bodyParser.json({ limit: '10000000mb' }));
+app.use(bodyParser.urlencoded({ limit: '10000000mb', extended: true }));
 
 
 
@@ -27,6 +28,7 @@ app.use('/', hospital)
 app.use('/hospital', hospital)
 app.use('/user', user)
 app.use('/admin_hospital', admin_hospital)
+app.use('/admin_doctor', admin_doctor)
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '')
   next()
