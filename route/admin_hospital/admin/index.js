@@ -51,6 +51,46 @@ const admin_hospital = {
         res.send('您的数据添加不成功，医院名称已存在');
       }
     });
+  },
+  hospital_getList: (req, res) => {
+    const query = 'SELECT * FROM hospital';
+
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error('获取数据失败', err);
+        res.status(500).json({ error: '获取数据失败，无法连接服务器' });
+        return;
+      }
+
+      res.send({
+        code: 200,
+        data: results,
+        message: '查询数据成功'
+      })
+    });
+  },
+  hospital_delete: (req, res) => {
+    const { id } = req.body;
+    console.log(req.body);
+    // 确保 id 存在且不为 1
+    if (!id || id === 1) {
+      return res.status(400).json({ error: '无效的 ID，无法删除 ID 为 1 的记录' });
+    }
+
+    const query = 'DELETE FROM hospital WHERE id = ? AND id <> 1';
+
+    db.query(query, [id], (err, results) => {
+      if (err) {
+        console.error('删除医院数据时出错:', err);
+        return res.status(500).json({ error: '删除医院数据失败' });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: '未找到指定 ID 的医院，或尝试删除 ID 为 1 的记录' });
+      }
+
+      res.status(200).json({ message: '医院删除成功' });
+    });
   }
 }
 module.exports = admin_hospital
