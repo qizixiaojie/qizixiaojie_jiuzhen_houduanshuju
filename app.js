@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const hospital = require('./route/hospital/index')
 const user = require('./route/user/index')
+const admin_hospital=require('./route/admin_hospital')
 const cors = require('cors')
 
 //这个组件用于接收post数据
@@ -12,13 +13,20 @@ const PORT = 8080
 //配置跨域请求
 app.use(cors())
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+// 增加请求大小限制
+
+app.use(bodyParser.json({limit:'10000000mb'}));
+app.use(bodyParser.urlencoded({limit:'10000000mb',extended:true}));
+
+
+
 
 // 导入医院相关的数据
 // 监听GET请求到'/'路径
 app.use('/', hospital)
 app.use('/hospital', hospital)
 app.use('/user', user)
+app.use('/admin_hospital', admin_hospital)
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '')
   next()
