@@ -237,7 +237,8 @@ const hospital = {
     const { hoscode, sub_depcode } = req.query
 
     // 先查询医院信息
-    const queryHos = `SELECT hosname FROM hospital WHERE hoscode = '${hoscode}'`
+    const queryHos = `SELECT hosname FROM hospital JOIN hospital_doctor ON hospital.hoscode 
+                      = hospital_doctor.hoscode WHERE hospital.hoscode = '${hoscode}'`
     let hosname = '' //医院信息
     db.query(queryHos, (error, results) => {
       if (error) {
@@ -268,32 +269,47 @@ const hospital = {
         sub_depname = results[0].sub_depname
         //1.查询对应的医生
         if (depcode !== '') {
-          const queryone = ` SELECT * FROM hospital_doctor WHERE hospital_doctor.depcode = '${depcode}';`
+          const queryone = `SELECT * FROM hospital_doctor WHERE hospital_doctor.depcode = '${depcode}'
+                             AND hospital_doctor.hoscode = '${hoscode}'`
           db.query(queryone, (error, results) => {
             if (error) {
+              console.log('``````````````````````````````');
               console.error('Error executing query:', error)
               return
             }
             doctor = results[0]
-            // 2根据医生获取排班信息
+          
+            if(results.length>0){
+              // 2根据医生获取排班信息
             const querytwo = ` SELECT * FROM hospital_doctor_time  WHERE hospital_doctor_time.doctorID = '${doctor.id}';`
-            db.query(querytwo, (error, results) => {
-              if (error) {
-                console.error('Error executing query:', error)
-                return
-              }
-              doctor_time = results
-              res.json({
-                code: 200,
-                message: '医生相关数据调用成功',
-                data: {
-                  doctor: doctor,
-                  sub_depname: sub_depname,
-                  doctor_time: doctor_time,
-                  hosname: hosname
+              db.query(querytwo, (error, results) => {
+                if (error) {
+                  console.error('Error executing query:', error)
+                  res.send({
+                    code:500,
+                    message:'该暂时没有医生排班信息'
+                  })
+                  return
                 }
+                doctor_time = results
+                res.json({
+                  code: 200,
+                  message: '医生相关数据调用成功',
+                  data: {
+                    doctor: doctor,
+                    sub_depname: sub_depname,
+                    doctor_time: doctor_time,
+                    hosname: hosname
+                  }
+                })
               })
-            })
+            }else{
+              console.log(results+'`````````````````');
+              res.json({
+                code:200,
+                message:'该医院暂时没有医院排班信息'
+              })
+            }
           })
         }
       }
