@@ -16,8 +16,8 @@ app.use(cors())
 app.use(bodyParser.json())
 // 增加请求大小限制
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
 
 
 // 导入医院相关的数据
