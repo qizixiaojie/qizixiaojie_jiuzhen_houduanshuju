@@ -152,7 +152,7 @@ const hospital = {
   findDetail: async (req, res) => {
     try {
       const { hoscode } = req.params // 从请求参数中获取 hoscode
-
+      console.log(hoscode, "hoscode");
       // 验证 hoscode 是否存在
       if (!hoscode) {
         return res.status(400).json({ code: 400, message: 'hoscode is required' })

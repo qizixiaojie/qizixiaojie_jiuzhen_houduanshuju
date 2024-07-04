@@ -11,6 +11,8 @@ router.post('/doctor_add', admin_doctor.doctor_add)
 router.get('/doctor_getList', admin_doctor.doctor_getList)
 //删除医生信息
 router.post('/doctor_delete', admin_doctor.doctor_delete)
+//更改医生信息
+router.post('/doctor_update', admin_doctor.doctor_update)
 
 
 module.exports = router

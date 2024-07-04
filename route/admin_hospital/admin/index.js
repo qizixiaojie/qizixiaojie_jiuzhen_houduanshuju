@@ -27,6 +27,18 @@ const admin_hospital = {
             return;
           }
           hoscode = results[0].last_id + 1;
+          //插入医院详情数据
+          const insertDetailQuery = `INSERT INTO hospital_detail (hoscode, quitTime, route, stopOrder, orderRule,intro_Detail) 
+          VALUES ('${hoscode}', '18:30', '乘车路线：12、14、18、19、28、31、34、38、39、40路到中医院；顺2、11、15、16、17、20、21、22、23、24、25、26、27、29、32、33、36、37、41、43、45路、945到国泰下车，向南行300米即到', 
+          '11:30到14:30',
+          '东院区预约号取号地点：东院区门诊楼地下一层挂号窗口取号。.南院区预约号取号地点：南院区门诊楼一层大厅挂号窗口取号。.北院区预约号取号地点：北院区门诊楼二层大厅挂号窗口取号。', 
+          '柒子诊所，作为一座引领医疗界潮流的现代化医疗机构，');`
+          console.log(insertDetailQuery);
+          db.query(insertDetailQuery, (err, results) => {
+            if (err) {
+              console.log(err);
+            }
+          });
         });
       }
       // 构建查询语句，检查是否存在相同的 hosname

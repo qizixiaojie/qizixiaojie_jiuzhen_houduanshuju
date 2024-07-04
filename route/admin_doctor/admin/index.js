@@ -2,6 +2,7 @@ const db = require('../../db/index')//引入数据库
 const admin_doctor = {
   doctor_add: (req, res) => {
     const { name, position, sub_depname, hosname, introduce } = req.body
+    console.log(req.body);
     let hoscode = ''//获取医院编码
     if (hosname) {
       const sql = `select hoscode from hospital where hosname='${hosname}'`
@@ -60,12 +61,11 @@ const admin_doctor = {
 
       doctorID = results[0].maxId;
       const sql3 = `
-    INSERT INTO hospital_doctor (name, depcode, introduce, position,money, doctorID, hoscode)
-    VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    INSERT INTO hospital_doctor (name, depcode, introduce, position,money, doctorID, hoscode,sub_depname)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
 
-
-      db.query(sql3, [name, depcode, introduce, position, money, doctorID, hoscode], (err, result) => {
+      db.query(sql3, [name, depcode, introduce, position, money, doctorID, hoscode, sub_depname], (err, result) => {
         if (err) {
           console.error('插入医生数据时出错:', err);
           return res.status(500).json({ code: 500, message: '插入医生数据失败' });
@@ -178,6 +178,78 @@ const admin_doctor = {
 
       res.status(200).json({ message: '医生删除成功' });
     });
+  },
+  doctor_update: (req, res) => {
+    const { name, position, sub_depname, hosname, introduce } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ code: 400, message: 'name 是必需的字段' });
+    }
+
+    // 获取医院编码
+    let hoscode = '';
+    if (hosname) {
+      db.query('SELECT hoscode FROM hospital_doctor WHERE name = ?', [name], (err, results) => {
+        if (err) {
+          return res.status(404).json({ code: 404, message: '还未有这个人' });
+        }
+        console.log(results);
+        hoscode = results[0].hoscode;
+
+        // 继续执行更新操作
+        updateDoctor();
+      });
+    } else {
+      // 如果没有 hosname，直接执行更新操作
+      updateDoctor();
+    }
+
+    function updateDoctor() {
+      // 获取部门编码
+      if (!sub_depname) {
+        return res.status(400).json({ code: 400, message: 'sub_depname 不能为空' });
+      }
+
+      db.query('SELECT depcode FROM hospital_sub_department WHERE sub_depname = ?', [sub_depname], (err, results) => {
+        if (err) {
+          console.error('查询子部门出错:', err);
+          return res.status(500).json({ code: 500, message: '查询子部门出错' });
+        }
+
+        if (results.length === 0) {
+          return res.status(404).json({ code: 404, message: '您找的部门不存在' });
+        }
+
+        const depcode = results[0].depcode;
+
+        // 检查医生是否存在
+        db.query('SELECT * FROM hospital_doctor WHERE name = ?', [name], (err, results) => {
+          if (err) {
+            console.error('查询医生出错:', err);
+            return res.status(500).json({ code: 500, message: '查询医生出错' });
+          }
+
+          if (results.length === 0) {
+            return res.status(404).json({ code: 404, message: '您还未添加数据' });
+          }
+
+          // 更新医生信息
+          const updateQuery = `
+            UPDATE hospital_doctor 
+            SET position = ?, depcode = ?, introduce = ?, hoscode = ?,sub_depname = ?
+            WHERE name = ?`;
+
+          db.query(updateQuery, [position, depcode, introduce, hoscode, sub_depname, name], (err, result) => {
+            if (err) {
+              console.error('更新医生信息出错:', err);
+              return res.status(500).json({ code: 500, message: '更新医生信息失败' });
+            }
+
+            res.status(200).json({ code: 200, message: '医生信息更新成功' });
+          });
+        });
+      });
+    }
   }
 }
 module.exports = admin_doctor
