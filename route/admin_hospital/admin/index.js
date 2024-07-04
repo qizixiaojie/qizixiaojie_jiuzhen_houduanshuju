@@ -1,11 +1,10 @@
 const db = require('../../db/index')//引入数据库 
 var multiparty = require('multiparty');
-let form = new multiparty.Form()
 const admin_hospital = {
   //对医院增加医院数据
   hospital_add: (req, res) => {
+    let form = new multiparty.Form()
     form.parse(req, function (err, fields, file) {
-      console.log(fields);
       const {
         hosname,
         hostype,
@@ -15,8 +14,7 @@ const admin_hospital = {
         daily_release_time,
         logoData
       } = fields
-      // console.log(hosname);
-      if (!logoData) {
+      if (!logoData && !hosname && !hostype && !logoData) {
         return res.status(500)
       }
 
@@ -53,7 +51,7 @@ const admin_hospital = {
               return;
             }
             console.log('添加成功');
-            res.send({
+            res.json({
               code: 200,
               messasge: 'success'
             });
@@ -106,7 +104,8 @@ const admin_hospital = {
     });
   },
   //修改医院信息
-  hospital_update: (req, res) => {
+  hospital_update: async (req, res) => {
+    let form = new multiparty.Form()
     form.parse(req, function (err, fields, file) {
       const { hosname, hostype, address, cityCode, intro, daily_release_time, logoData } = fields;
       console.log(req.body);
@@ -141,7 +140,7 @@ const admin_hospital = {
             return;
           }
           console.log('更新成功');
-          res.send({
+          res.json({
             code: 200,
             message: '更新成功'
           });
