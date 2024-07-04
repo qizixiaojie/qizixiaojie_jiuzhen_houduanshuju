@@ -16,10 +16,8 @@ app.use(cors())
 app.use(bodyParser.json())
 // 增加请求大小限制
 
-app.use(bodyParser.json({ limit: '10000000mb' }));
-app.use(bodyParser.urlencoded({ limit: '10000000mb', extended: true }));
-
-
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 
 // 导入医院相关的数据
@@ -43,8 +41,6 @@ app.get('/jokes/random', (req, res) => {
   })
 })
 // 用户登录相关
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
 
 // 开始监听指定端口
 app.listen(PORT, () => {

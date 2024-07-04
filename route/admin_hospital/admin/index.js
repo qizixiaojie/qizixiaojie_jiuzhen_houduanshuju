@@ -94,6 +94,48 @@ const admin_hospital = {
 
       res.status(200).json({ message: '医院删除成功' });
     });
+  },
+  //修改医院信息
+  hospital_update: (req, res) => {
+    const { hosname, hostype, address, cityCode, intro, daily_release_time, logoData } = req.body;
+    console.log(req.body);
+    // 先根据 hosname 查询对应的 id
+    const idQuery = `SELECT id FROM hospital WHERE hosname = '${hosname}'`;
+
+    db.query(idQuery, (err, results) => {
+
+      if (err) {
+        console.error('查询错误:', err);
+        res.status(500).send('内部服务器错误');
+        return;
+      }
+
+      if (results.length === 0) {
+        // 如果没有找到对应 hosname 的记录，返回错误响应
+        res.send('未找到对应医院名称的记录，无法更新');
+        return;
+      }
+
+      const id = results[0].id;  // 获取查询到的 id
+
+      // 构建更新语句
+      const updateQuery = `UPDATE hospital 
+                          SET hosname = '${hosname}', hostype = '${hostype}', address = '${address}', cityCode = '${cityCode}', intro = '${intro}', daily_release_time = '${daily_release_time}', logoData = '${logoData}'
+                          WHERE id = '${id}'`;
+
+      db.query(updateQuery, (err, result) => {
+        if (err) {
+          console.error('更新错误:', err);
+          res.status(500).send('内部服务器错误');
+          return;
+        }
+        console.log('更新成功');
+        res.send({
+          code: 200,
+          message: '更新成功'
+        });
+      });
+    });
   }
 }
 module.exports = admin_hospital
