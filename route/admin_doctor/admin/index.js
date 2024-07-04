@@ -117,6 +117,67 @@ const admin_doctor = {
 
 
 
+  },
+  doctor_getList: (req, res) => {
+    db.query('SELECT * FROM hospital_doctor', (err, results) => {
+      if (err) {
+        res.send({
+          code: 500,
+          message: '获取数据时发生错误'
+        });
+        return;
+      }
+
+      // 定义一个标志，用于判断是否已经发送了响应
+      let responseSent = false;
+
+      // 遍历 results 数组
+      for (let doctor of results) {
+        db.query(`SELECT sub_depname FROM hospital_sub_department WHERE depcode = '${doctor.depcode}'`, (subErr, subResults) => {
+          if (subErr) {
+            console.error('获取科室名称时发生错误:', subErr);
+          } else {
+            if (subResults.length > 0) {
+              doctor.sub_depname = subResults[0].sub_depname;
+            }
+          }
+
+          // 如果还没有发送响应，发送最终的响应
+          if (!responseSent) {
+            res.send({
+              code: 200,
+              message: '获取数据成功',
+              data: results
+            });
+            responseSent = true;
+          }
+        });
+      }
+    });
+  },
+  //删除医生数据
+  doctor_delete: (req, res) => {
+    const { id } = req.body;
+    console.log(req.body);
+    // 确保 id 存在且不为 1
+    if (!id || id === 1) {
+      return res.status(400).json({ error: '无效的 ID，无法删除 ID 为 1 的记录' });
+    }
+
+    const query = 'DELETE FROM hospital_doctor WHERE id =? AND id <> 1';
+
+    db.query(query, [id], (err, results) => {
+      if (err) {
+        console.error('删除医生数据时出错:', err);
+        return res.status(500).json({ error: '删除医生数据失败' });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: '未找到指定 ID 的医生，或尝试删除 ID 为 1 的记录' });
+      }
+
+      res.status(200).json({ message: '医生删除成功' });
+    });
   }
 }
 module.exports = admin_doctor

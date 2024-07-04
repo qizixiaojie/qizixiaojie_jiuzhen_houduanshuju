@@ -44,7 +44,10 @@ const admin_hospital = {
             return;
           }
           console.log('~~~~~~~~~~~~~~~~~');
-          res.send('数据添加成功');
+          res.send({
+            code: 200,
+            messasge: 'success'
+          });
         });
       } else {
         // 如果存在相同的 hosname，返回添加不成功的响应

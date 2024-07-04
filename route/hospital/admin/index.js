@@ -278,16 +278,16 @@ const hospital = {
               return
             }
             doctor = results[0]
-          
-            if(results.length>0){
+            console.log(results[0]);
+            if (results.length > 0) {
               // 2根据医生获取排班信息
-            const querytwo = ` SELECT * FROM hospital_doctor_time  WHERE hospital_doctor_time.doctorID = '${doctor.id}';`
+              const querytwo = ` SELECT * FROM hospital_doctor_time  WHERE hospital_doctor_time.doctorID = '${doctor.doctorID}';`
               db.query(querytwo, (error, results) => {
                 if (error) {
                   console.error('Error executing query:', error)
                   res.send({
-                    code:500,
-                    message:'该暂时没有医生排班信息'
+                    code: 500,
+                    message: '该暂时没有医生排班信息'
                   })
                   return
                 }
@@ -303,11 +303,11 @@ const hospital = {
                   }
                 })
               })
-            }else{
-              console.log(results+'`````````````````');
+            } else {
+              console.log(results + '`````````````````');
               res.json({
-                code:200,
-                message:'该医院暂时没有医院排班信息'
+                code: 200,
+                message: '该医院暂时没有医院排班信息'
               })
             }
           })
