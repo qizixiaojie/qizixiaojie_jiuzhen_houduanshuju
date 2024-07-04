@@ -245,7 +245,7 @@ const admin_doctor = {
               return res.status(500).json({ code: 500, message: '更新医生信息失败' });
             }
 
-            res.status(200).json({ code: 200, message: '医生信息更新成功' });
+            res.status(200).json({ code: 200, message: '医生信息更新成功a' });
           });
         });
       });
